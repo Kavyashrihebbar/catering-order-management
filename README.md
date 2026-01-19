@@ -40,3 +40,26 @@ This project provides a digital solution where:
 * VS Code
 * pgAdmin / psql
 * Uvicorn
+  
+### Project Structure
+
+```text
+catering-order-management/
+│
+├── backend/
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── main.jsx
+│   └── package.json
+│
+└── README.md
+```
+
