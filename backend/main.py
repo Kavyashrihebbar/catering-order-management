@@ -22,7 +22,7 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/orders")
+@app.post("/orders", response_model=schemas.OrderResponse)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     db_order = models.Order(**order.dict())
     db.add(db_order)
@@ -30,7 +30,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     db.refresh(db_order)
     return db_order
 
-@app.get("/orders")
+@app.get("/orders", response_model=list[schemas.OrderResponse])
 def get_orders(db: Session = Depends(get_db)):
     return db.query(models.Order).all()
 

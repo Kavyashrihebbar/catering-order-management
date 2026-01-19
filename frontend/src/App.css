@@ -1,42 +1,149 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+}
+
+.container {
+  width: 100vw;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+header {
   text-align: center;
+  margin-bottom: 20px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+header h1 {
+  color: #2c3e50;
+  margin-bottom: 5px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.subtitle {
+  color: #34495e;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/* Cards */
 .card {
-  padding: 2em;
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.read-the-docs {
-  color: #888;
+/* FORM GRID */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+/* Full-width inputs */
+.full-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.full-input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+}
+
+/* Menu items grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.menu-item input {
+  margin-right: 10px;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-btn {
+  background: linear-gradient(90deg,#6a11cb,#2575fc);
+  color: white;
+}
+
+.add-btn:hover {
+  background: linear-gradient(90deg,#2575fc,#6a11cb);
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* Orders List */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.order-info {
+  flex: 1 1 60%;
+}
+
+.order-info h3 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+}
+
+.order-info p {
+  margin: 2px 0;
+  color: #34495e;
+}
+
+.price {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.no-orders {
+  text-align: center;
+  font-style: italic;
+  color: #7f8c8d;
 }

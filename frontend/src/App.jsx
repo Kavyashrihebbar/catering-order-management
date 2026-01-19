@@ -1,29 +1,76 @@
 import { useEffect, useState } from "react";
+import "./App.css";
+
+const MENU_PRICES = {
+  "Veg Meals": 150,
+  "Non-Veg Meals": 250,
+  "Starters": 120,
+  "Desserts": 100,
+  "Soft Drinks": 50
+};
 
 function App() {
   const [orders, setOrders] = useState([]);
-  const [customerName, setCustomerName] = useState("");
+  const [form, setForm] = useState({
+    customer_name: "",
+    event_date: "",
+    guests_count: "",
+    menu_items: [],
+    contact_number: ""
+  });
 
   const fetchOrders = async () => {
     const res = await fetch("http://127.0.0.1:8000/orders");
     setOrders(await res.json());
   };
 
+  const toggleMenuItem = (item) => {
+    setForm(prev => ({
+      ...prev,
+      menu_items: prev.menu_items.includes(item)
+        ? prev.menu_items.filter(i => i !== item)
+        : [...prev.menu_items, item]
+    }));
+  };
+
+  const calculateAmount = () => {
+    const totalPerGuest = form.menu_items.reduce((sum, item) => sum + MENU_PRICES[item], 0);
+    return totalPerGuest * Number(form.guests_count || 0);
+  };
+
   const addOrder = async () => {
-    await fetch("http://127.0.0.1:8000/orders", {
+    if (!form.customer_name || !form.event_date || !form.guests_count || !form.menu_items.length || !form.contact_number) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    const res = await fetch("http://127.0.0.1:8000/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        customer_name: customerName,
-        event_type: "Wedding",
-        event_date: "2026-01-20",
-        guests_count: 200,
-        menu_type: "Veg",
-        contact_number: "9876543210",
-        status: "Booked",
-      }),
+        customer_name: form.customer_name,
+        event_date: form.event_date,
+        guests_count: Number(form.guests_count),
+        menu_items: form.menu_items.join(", "),
+        amount: calculateAmount(),
+        contact_number: form.contact_number,
+        status: "Booked"
+      })
     });
-    setCustomerName("");
+
+    if (!res.ok) {
+      alert("Error adding order");
+      return;
+    }
+
+    setForm({
+      customer_name: "",
+      event_date: "",
+      guests_count: "",
+      menu_items: [],
+      contact_number: ""
+    });
+
     fetchOrders();
   };
 
@@ -32,29 +79,63 @@ function App() {
     fetchOrders();
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(() => { fetchOrders(); }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Catering Order Management</h2>
+    <div className="container">
+      <header>
+        <h1>Catering Order Management</h1>
+        <p className="subtitle">Good food, good mood</p>
+      </header>
 
-      <input
-        placeholder="Customer Name"
-        value={customerName}
-        onChange={(e) => setCustomerName(e.target.value)}
-      />
-      <button onClick={addOrder}>Add Order</button>
+      {/* FORM CARD */}
+      <div className="card form-card">
+        <h2>Add New Order</h2>
 
-      <ul>
-        {orders.map((o) => (
-          <li key={o.id}>
-            {o.customer_name}
-            <button onClick={() => deleteOrder(o.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+        <div className="form-grid">
+          <input className="full-input" placeholder="Customer Name" value={form.customer_name} onChange={e => setForm({...form, customer_name: e.target.value})}/>
+          <input className="full-input" type="date" value={form.event_date} onChange={e => setForm({...form, event_date: e.target.value})}/>
+          <input className="full-input" type="number" placeholder="Number of Guests" value={form.guests_count} onChange={e => setForm({...form, guests_count: e.target.value})}/>
+          <input className="full-input" placeholder="Contact Number" value={form.contact_number} onChange={e => setForm({...form, contact_number: e.target.value})}/>
+        </div>
+
+        <div className="menu-box">
+          <h3>Select Menu Items</h3>
+          <div className="menu-grid">
+            {Object.keys(MENU_PRICES).map(item => (
+              <label key={item} className="menu-item">
+                <input type="checkbox" checked={form.menu_items.includes(item)} onChange={() => toggleMenuItem(item)}/>
+                {item} (₹{MENU_PRICES[item]} per guest)
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <p className="amount">Total Amount: ₹{calculateAmount()}</p>
+        <button className="btn add-btn" onClick={addOrder}>Add Order</button>
+      </div>
+
+      {/* ORDERS LIST */}
+      <div className="card orders-card">
+        <h2>All Orders</h2>
+
+        {orders.length === 0 && <p className="no-orders">No orders yet</p>}
+
+        <div className="orders-list">
+          {orders.map(o => (
+            <div className="order-item" key={o.id}>
+              <div className="order-info">
+                <h3>{o.customer_name}</h3>
+                <p><strong>Event Date:</strong> {o.event_date}</p>
+                <p><strong>Guests:</strong> {o.guests_count}</p>
+                <p><strong>Menu:</strong> {o.menu_items}</p>
+                <p className="price"><strong>Total:</strong> ₹{o.amount}</p>
+              </div>
+              <button className="delete-btn" onClick={() => deleteOrder(o.id)}>Delete</button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
