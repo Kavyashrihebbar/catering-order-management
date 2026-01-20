@@ -23,6 +23,8 @@ function App() {
   const fetchOrders = async () => {
     const res = await fetch("http://127.0.0.1:8000/orders");
     setOrders(await res.json());
+    console.log("Orders received:", data); // 🔴 IMPORTANT
+
   };
 
   const toggleMenuItem = (item) => {
