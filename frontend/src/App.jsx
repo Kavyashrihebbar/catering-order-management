@@ -34,16 +34,57 @@ function App() {
   };
 
   const calculateAmount = () => {
-    const totalPerGuest = form.menu_items.reduce((sum, item) => sum + MENU_PRICES[item], 0);
+    const totalPerGuest = form.menu_items.reduce(
+      (sum, item) => sum + MENU_PRICES[item],
+      0
+    );
     return totalPerGuest * Number(form.guests_count || 0);
   };
 
+  // ✅ VALIDATION ADDED HERE (NO UI CHANGE)
   const addOrder = async () => {
-    if (!form.customer_name || !form.event_date || !form.guests_count || !form.menu_items.length || !form.contact_number) {
+
+    // Empty check
+    if (
+      !form.customer_name ||
+      !form.event_date ||
+      !form.guests_count ||
+      !form.menu_items.length ||
+      !form.contact_number
+    ) {
       alert("Please fill all fields");
       return;
     }
 
+    // Customer name → only letters & spaces
+    if (!/^[A-Za-z\s]+$/.test(form.customer_name)) {
+      alert("Customer name should contain only letters and spaces");
+      return;
+    }
+
+    // Guests count → minimum 1
+    if (Number(form.guests_count) < 1) {
+      alert("Guests count must be at least 1");
+      return;
+    }
+
+    // Contact number → 10 digits
+    if (!/^\d{10}$/.test(form.contact_number)) {
+      alert("Contact number must be exactly 10 digits");
+      return;
+    }
+
+    // Event date → today or future
+    const selectedDate = new Date(form.event_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      alert("Event date cannot be in the past");
+      return;
+    }
+
+    // API call
     const res = await fetch("http://127.0.0.1:8000/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,7 +120,9 @@ function App() {
     fetchOrders();
   };
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   return (
     <div className="container">
@@ -88,15 +131,35 @@ function App() {
         <p className="subtitle">Good food, good mood</p>
       </header>
 
-      {/* FORM CARD */}
       <div className="card form-card">
         <h2>Add New Order</h2>
 
         <div className="form-grid">
-          <input className="full-input" placeholder="Customer Name" value={form.customer_name} onChange={e => setForm({...form, customer_name: e.target.value})}/>
-          <input className="full-input" type="date" value={form.event_date} onChange={e => setForm({...form, event_date: e.target.value})}/>
-          <input className="full-input" type="number" placeholder="Number of Guests" value={form.guests_count} onChange={e => setForm({...form, guests_count: e.target.value})}/>
-          <input className="full-input" placeholder="Contact Number" value={form.contact_number} onChange={e => setForm({...form, contact_number: e.target.value})}/>
+          <input
+            className="full-input"
+            placeholder="Customer Name"
+            value={form.customer_name}
+            onChange={e => setForm({ ...form, customer_name: e.target.value })}
+          />
+          <input
+            className="full-input"
+            type="date"
+            value={form.event_date}
+            onChange={e => setForm({ ...form, event_date: e.target.value })}
+          />
+          <input
+            className="full-input"
+            type="number"
+            placeholder="Number of Guests"
+            value={form.guests_count}
+            onChange={e => setForm({ ...form, guests_count: e.target.value })}
+          />
+          <input
+            className="full-input"
+            placeholder="Contact Number"
+            value={form.contact_number}
+            onChange={e => setForm({ ...form, contact_number: e.target.value })}
+          />
         </div>
 
         <div className="menu-box">
@@ -104,7 +167,11 @@ function App() {
           <div className="menu-grid">
             {Object.keys(MENU_PRICES).map(item => (
               <label key={item} className="menu-item">
-                <input type="checkbox" checked={form.menu_items.includes(item)} onChange={() => toggleMenuItem(item)}/>
+                <input
+                  type="checkbox"
+                  checked={form.menu_items.includes(item)}
+                  onChange={() => toggleMenuItem(item)}
+                />
                 {item} (₹{MENU_PRICES[item]} per guest)
               </label>
             ))}
@@ -112,10 +179,11 @@ function App() {
         </div>
 
         <p className="amount">Total Amount: ₹{calculateAmount()}</p>
-        <button className="btn add-btn" onClick={addOrder}>Add Order</button>
+        <button className="btn add-btn" onClick={addOrder}>
+          Add Order
+        </button>
       </div>
 
-      {/* ORDERS LIST */}
       <div className="card orders-card">
         <h2>All Orders</h2>
 
@@ -131,7 +199,12 @@ function App() {
                 <p><strong>Menu:</strong> {o.menu_items}</p>
                 <p className="price"><strong>Total:</strong> ₹{o.amount}</p>
               </div>
-              <button className="delete-btn" onClick={() => deleteOrder(o.id)}>Delete</button>
+              <button
+                className="delete-btn"
+                onClick={() => deleteOrder(o.id)}
+              >
+                Delete
+              </button>
             </div>
           ))}
         </div>
