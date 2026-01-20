@@ -19,6 +19,7 @@ function App() {
     contact_number: ""
   });
 
+  // Fetch orders
   const fetchOrders = async () => {
     const res = await fetch("http://127.0.0.1:8000/orders");
     setOrders(await res.json());
@@ -41,10 +42,8 @@ function App() {
     return totalPerGuest * Number(form.guests_count || 0);
   };
 
-  // ✅ VALIDATION ADDED HERE (NO UI CHANGE)
+  // Add new order with validation
   const addOrder = async () => {
-
-    // Empty check
     if (
       !form.customer_name ||
       !form.event_date ||
@@ -56,25 +55,21 @@ function App() {
       return;
     }
 
-    // Customer name → only letters & spaces
     if (!/^[A-Za-z\s]+$/.test(form.customer_name)) {
       alert("Customer name should contain only letters and spaces");
       return;
     }
 
-    // Guests count → minimum 1
     if (Number(form.guests_count) < 1) {
       alert("Guests count must be at least 1");
       return;
     }
 
-    // Contact number → 10 digits
     if (!/^\d{10}$/.test(form.contact_number)) {
       alert("Contact number must be exactly 10 digits");
       return;
     }
 
-    // Event date → today or future
     const selectedDate = new Date(form.event_date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -84,7 +79,6 @@ function App() {
       return;
     }
 
-    // API call
     const res = await fetch("http://127.0.0.1:8000/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -123,6 +117,11 @@ function App() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  // Sort orders by event date (earliest first)
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(a.event_date) - new Date(b.event_date)
+  );
 
   return (
     <div className="container">
@@ -187,22 +186,21 @@ function App() {
       <div className="card orders-card">
         <h2>All Orders</h2>
 
-        {orders.length === 0 && <p className="no-orders">No orders yet</p>}
+        {sortedOrders.length === 0 && <p className="no-orders">No orders yet</p>}
 
         <div className="orders-list">
-          {orders.map(o => (
+          {sortedOrders.map((o, index) => (
             <div className="order-item" key={o.id}>
               <div className="order-info">
-                <h3>{o.customer_name}</h3>
+                <h3>Order #{index + 1}</h3>
+                <p><strong>Customer:</strong> {o.customer_name}</p>
                 <p><strong>Event Date:</strong> {o.event_date}</p>
                 <p><strong>Guests:</strong> {o.guests_count}</p>
                 <p><strong>Menu:</strong> {o.menu_items}</p>
                 <p className="price"><strong>Total:</strong> ₹{o.amount}</p>
+                <p><strong>Status:</strong> {o.status}</p>
               </div>
-              <button
-                className="delete-btn"
-                onClick={() => deleteOrder(o.id)}
-              >
+              <button className="delete-btn" onClick={() => deleteOrder(o.id)}>
                 Delete
               </button>
             </div>
